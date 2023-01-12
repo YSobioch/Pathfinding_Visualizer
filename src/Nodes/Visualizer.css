@@ -1,0 +1,13 @@
+.Holder {
+    text-align: center;
+}
+
+.Row {
+    text-align: center;
+    padding-bottom: 3px;
+}
+
+.Col {
+    display: inline-block;
+    padding: 2px;
+}

@@ -1,0 +1,61 @@
+.node {
+    outline: solid;
+    outline-width: 1px;
+    height: 30px;
+    width: 30px;
+    outline-color: rgb(143, 141, 141);
+}
+
+.node.start {
+    background-color: green;
+}
+
+.node.end {
+    background-color: red;
+}
+
+.node.visited {
+    background-color: rgb(116, 181, 255);
+    animation-name: visiting;
+    animation-timing-function: ease;
+    animation-duration: 3s;
+}
+
+.node.wall {
+    background-color: black;
+    outline-color: black;
+    animation-name: creatingWall;
+    animation-duration: 0.3s;
+}
+
+.node.path {
+    background-color: yellow;
+    animation-name: path;
+    animation-duration: 3s;
+    animation-delay: 1s;
+}
+
+@keyframes path {
+    0% {background-color: yellow;}
+    40% {background-color: rgba(255, 255, 0, 0.281);};
+    100% {background-color: yellow;}
+}
+
+@keyframes creatingWall {
+    0% {transform: scale(0.3)}
+    100% {transform: scale(1);}
+}
+
+@keyframes visiting {
+    0% {
+        transform: scale(0.2);
+        background-color: yellow;
+    }
+    5% {
+        transform: scale(.4);
+        background-color: rgb(0, 255, 64);}
+    25% {
+        transform: scale(1);
+        background-color: rgb(59, 231, 102);}
+    100% {background-color: rgb(116, 181, 255);}
+}
