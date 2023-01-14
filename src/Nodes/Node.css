@@ -7,11 +7,11 @@
 }
 
 .node.start {
-    background-color: green;
+    background-image: url(/public/startIcon.png);
 }
 
 .node.end {
-    background-color: red;
+    background-image: url(/public/flagIcon.png);
 }
 
 .node.visited {
@@ -22,8 +22,8 @@
 }
 
 .node.wall {
-    background-color: black;
-    outline-color: black;
+    background-color: rgb(41, 40, 40);
+    outline-color: rgb(80, 80, 80);
     animation-name: creatingWall;
     animation-duration: 0.3s;
 }

@@ -18,7 +18,8 @@ export default class Node extends Component {
         if(isWall) className = 'node wall';
         if(isPath) className = 'node path';
         return (
-        <div className={className}></div>
+        <div className={className}>
+        </div>
         )
     }
 }
