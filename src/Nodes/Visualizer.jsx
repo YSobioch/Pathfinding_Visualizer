@@ -2,6 +2,7 @@ import React, { Component } from 'react'
 import Node from './Node';
 import { dijkstra, sortNodesByDistance } from '../Algorithms/Dijkstra';
 import { aStar } from '../Algorithms/AStar';
+import { biDirectional } from '../Algorithms/BiDirectional';
 import { randomizedPrim } from '../Algorithms/RandomizedPrim';
 
 import './Visualizer.css'
@@ -138,6 +139,14 @@ export default class Visualizer extends Component {
         this.animateAlgorithm(visitedNodesInOrder);
     }
 
+    visualizeBiDirection() {
+        const nodes = this.state.nodes
+        const startNode = nodes[startCol][startRow];
+        const endNode = nodes[endCol][endRow];
+        const visitedNodesInOrder = biDirectional(nodes, startNode, endNode);
+        this.animateAlgorithm(visitedNodesInOrder);
+    }
+
     //uses the randomized prim algorithm to generate a random maze
     createMaze() {
         let wallGrid = randomizedPrim(startCol, startRow, endCol, endRow);
@@ -168,6 +177,7 @@ export default class Visualizer extends Component {
         <>
         <Button onClick={() => this.visualizeDijkstra()}>Dijkstra</Button>
         <Button onClick={() => this.visualizeAStar()}>A*</Button>
+        <Button onClick={() => this.visualizeBiDirection()}>Bi-Directional</Button>
         <Button onClick={() => this.createMaze()}>Generate Maze</Button>
         <div className='Holder'>
             {nodes.map((row, index) => {

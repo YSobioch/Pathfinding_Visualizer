@@ -73,7 +73,6 @@ function canBePath(neighbors) {
         if(neighbor.isEnd) return true;
         if(!neighbor.isWall) {
             validNeighbors++;
-            console.log(validNeighbors)
         }
     }
     return validNeighbors <= 1;
