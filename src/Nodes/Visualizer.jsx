@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import Node from './Node';
-import { dijkstra, sortNodesByDistance } from '../Algorithms/Dijkstra';
-import { aStar } from '../Algorithms/AStar';
+import { dijkstra, getNeighbors } from '../Algorithms/Dijkstra';
+import { aStar, getDistance } from '../Algorithms/AStar';
 import { biDirectional } from '../Algorithms/BiDirectional';
 import { randomizedPrim } from '../Algorithms/RandomizedPrim';
 
@@ -75,7 +75,7 @@ export default class Visualizer extends Component {
     }
 
     //animates the algorithm by looping through the visited nodes in order
-    animateAlgorithm(visitedNodes){
+    animateAlgorithm(visitedNodes, binary = false){
         for(let node of visitedNodes){
             if(node === null) break;
             node.visited = false;
@@ -93,7 +93,7 @@ export default class Visualizer extends Component {
             newNodes[node.col][node.row] = newNode;
             this.setState({nodes: newNodes});
             if(i === visitedNodes.length - 1) {
-                this.animatePath(node);
+                binary ? this.animateBinaryPath(node) : this.animatePath(node);
             }
             }, 10 * i)
         }
@@ -122,6 +122,43 @@ export default class Visualizer extends Component {
         }
     }
 
+    animateBinaryPath(node) {
+        let finalNode = node;
+        let previous = node.previousNode;
+        let middleNode = node;
+        let neigbors = getNeighbors(finalNode, this.state.nodes);
+        let pathNodes = [];
+        for(let neighbor of neigbors) {
+            if(!neighbor.visited) continue;
+            let distance = getDistance(neighbor.previousNode, previous);
+            if(distance > 2) finalNode = neighbor;
+        }
+        console.log(finalNode);
+        console.log(middleNode);
+        console.log(neigbors)
+        while(middleNode !== null) {
+            pathNodes.unshift(middleNode);
+            middleNode = middleNode.previousNode;
+        }
+        while(finalNode !== null) {
+            pathNodes.push(finalNode);
+            finalNode = finalNode.previousNode
+        }
+        for(let j = pathNodes.length - 1; j >= 0; j--) {
+            setTimeout(() => {
+                node = pathNodes[j];
+                const newNodes = [...this.state.nodes];
+                const newNode = {
+                ...node,
+                isPath: true,
+            };
+            newNodes[node.col][node.row] = newNode;
+            this.setState({nodes: newNodes});
+            }, 20 * j)
+        }
+        
+    }
+
     //uses the djikstra algorithm to generate visitedNodes, and then animates them
     visualizeDijkstra() {
         const nodes = this.state.nodes
@@ -143,8 +180,8 @@ export default class Visualizer extends Component {
         const nodes = this.state.nodes
         const startNode = nodes[startCol][startRow];
         const endNode = nodes[endCol][endRow];
-        const visitedNodesInOrder = biDirectional(nodes, startNode, endNode);
-        this.animateAlgorithm(visitedNodesInOrder);
+        const visitedNodesInOrder = biDirectional(startNode, endNode, nodes);
+        this.animateAlgorithm(visitedNodesInOrder, true);
     }
 
     //uses the randomized prim algorithm to generate a random maze

@@ -13,8 +13,6 @@ export function dijkstra(grid, start, target) {
         closestNode.visited = true;
         visitedNodesInOrder.push(closestNode)
         if(closestNode === target) {
-            console.log('finished!');
-            console.log(visitedNodesInOrder)
             return visitedNodesInOrder;
         } 
         updateNeighbors(closestNode, grid);
@@ -35,7 +33,7 @@ function updateNeighbors(node, grid) {
     }
 }
 
-function getNeighbors(node, grid) {
+export function getNeighbors(node, grid) {
     const neighbors = [];
     const {col, row} = node;
     if(row > 0 && grid[col][row-1] !== undefined) neighbors.push(grid[col][row-1]);

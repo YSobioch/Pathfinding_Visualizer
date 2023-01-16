@@ -20,7 +20,7 @@ export function aStar(grid, start, target) {
     }
 }
 
-function getDistance(nodeOne, nodeTwo) {
+export function getDistance(nodeOne, nodeTwo) {
     let colDistance = Math.abs(nodeOne.col - nodeTwo.col);
     let rowDistance = Math.abs(nodeOne.row - nodeTwo.row);
     return colDistance + rowDistance;
