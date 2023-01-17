@@ -13,12 +13,17 @@ const startCol = 9;
 const startRow = 9;
 const endCol = 40;
 const endRow = 9;
+const COLUMNS = 50;
+const ROWS = 20;
 export default class Visualizer extends Component {
     constructor(props) {
         super(props);
         this.state = {
             nodes : [[]],
+            walls : [[]],
             mouseIsPressed: false,
+            nodesChecked : 0,
+            numberOfNodes : COLUMNS * ROWS,
         }
     }
 
@@ -26,8 +31,8 @@ export default class Visualizer extends Component {
     //the user to click and drag walls into place.
     //-------------------------------------------------------------------------------------------------------
     mouseDownHelper(node) {
-        this.changeWall(node);
         this.setState({...this.state, mouseIsPressed : true,})
+        this.changeWall(node);
     }
 
     mouseEnterHelper(node) {
@@ -45,33 +50,14 @@ export default class Visualizer extends Component {
             isWall: !node.isWall,
         };
         newNodes[node.col][node.row] = newNode;
-        this.setState({nodes: newNodes})
+        this.setState({nodes : newNodes, walls : newNodes})
     }
     //--------------------------------------------------------------------------------------------------------
     
     //generates the nodes that will be used in the graph in data
     componentDidMount() {
-        let table = [];
-        for(let i = 0; i < 50; i++) {
-            let col = []
-            for(let j = 0; j < 20; j++) {
-                let currentNode = {
-                    col: i,
-                    row: j,
-                    isStart: i === startCol && j === startRow,
-                    isEnd: i === endCol && j === endRow,
-                    distance: Infinity,
-                    distanceFromStart: Infinity,
-                    visited: false,
-                    isWall: false,
-                    isPath: false,
-                    previousNode: null,
-                }
-                col.push(currentNode)
-            }
-            table.push(col);
-        }
-        this.setState({nodes : table})
+        let table = this.createClearBoard();
+        this.setState({nodes : table, walls : table})
     }
 
     //animates the algorithm by looping through the visited nodes in order
@@ -92,6 +78,7 @@ export default class Visualizer extends Component {
             };
             newNodes[node.col][node.row] = newNode;
             this.setState({nodes: newNodes});
+            this.setState({nodesChecked : this.state.nodesChecked++})
             if(i === visitedNodes.length - 1) {
                 binary ? this.animateBinaryPath(node) : this.animatePath(node);
             }
@@ -104,6 +91,15 @@ export default class Visualizer extends Component {
         let finalNode = node;
         let pathNodes = [];
         while(finalNode !== null) {
+            finalNode.direction = 'right'
+            finalNode.current = true;
+            if(finalNode.previousNode !== null) {
+                let previousNode = finalNode.previousNode;
+                if(previousNode.row === finalNode.row + 1) finalNode.direction = 'up';
+                if(previousNode.row === finalNode.row - 1) finalNode.direction = 'down';
+                if(previousNode.col === finalNode.col + 1) finalNode.direction = 'left';
+                if(previousNode.col === finalNode.col - 1) finalNode.direction = 'right';
+            }
             pathNodes.unshift(finalNode);
             finalNode = finalNode.previousNode;
         }
@@ -115,10 +111,17 @@ export default class Visualizer extends Component {
                 const newNode = {
                 ...node,
                 isPath: true,
-            };
+                };
             newNodes[node.col][node.row] = newNode;
+            if(node.previousNode !== null) {
+                const lastNode = newNode.previousNode;
+                lastNode.current = false;
+                lastNode.isPath = true;
+                newNodes[lastNode.col][lastNode.row] = lastNode;
+            }
             this.setState({nodes: newNodes});
-            }, 20 * j)
+            }, 35 * j)
+            
         }
     }
 
@@ -133,9 +136,6 @@ export default class Visualizer extends Component {
             let distance = getDistance(neighbor.previousNode, previous);
             if(distance > 2) finalNode = neighbor;
         }
-        console.log(finalNode);
-        console.log(middleNode);
-        console.log(neigbors)
         while(middleNode !== null) {
             pathNodes.unshift(middleNode);
             middleNode = middleNode.previousNode;
@@ -154,14 +154,14 @@ export default class Visualizer extends Component {
             };
             newNodes[node.col][node.row] = newNode;
             this.setState({nodes: newNodes});
-            }, 20 * j)
+            }, 35 * j)
         }
         
     }
 
     //uses the djikstra algorithm to generate visitedNodes, and then animates them
     visualizeDijkstra() {
-        const nodes = this.state.nodes
+        const nodes = this.resetBoardWithWalls();
         const startNode = nodes[startCol][startRow];
         const endNode = nodes[endCol][endRow];
         const visitedNodesInOrder = dijkstra(nodes, startNode, endNode);
@@ -169,7 +169,7 @@ export default class Visualizer extends Component {
     }
 
     visualizeAStar() {
-        const nodes = this.state.nodes
+        const nodes = this.resetBoardWithWalls();
         const startNode = nodes[startCol][startRow];
         const endNode = nodes[endCol][endRow];
         const visitedNodesInOrder = aStar(nodes, startNode, endNode);
@@ -177,7 +177,7 @@ export default class Visualizer extends Component {
     }
 
     visualizeBiDirection() {
-        const nodes = this.state.nodes
+        const nodes = this.resetBoardWithWalls();
         const startNode = nodes[startCol][startRow];
         const endNode = nodes[endCol][endRow];
         const visitedNodesInOrder = biDirectional(startNode, endNode, nodes);
@@ -186,6 +186,7 @@ export default class Visualizer extends Component {
 
     //uses the randomized prim algorithm to generate a random maze
     createMaze() {
+        this.createClearBoard(true);
         let wallGrid = randomizedPrim(startCol, startRow, endCol, endRow);
         for(let i = 0; i < wallGrid.length; i++) {
             for(let j = 0; j < wallGrid[0].length; j++) {
@@ -205,6 +206,47 @@ export default class Visualizer extends Component {
         }
     }
 
+    createClearBoard(visualizeReset = false){
+        let table = [];
+        for(let i = 0; i < 50; i++) {
+            let col = []
+            for(let j = 0; j < 20; j++) {
+                let currentNode = {
+                    col: i,
+                    row: j,
+                    isStart: i === startCol && j === startRow,
+                    isEnd: i === endCol && j === endRow,
+                    distance: Infinity,
+                    distanceFromStart: Infinity,
+                    current: i === startCol && j === startRow,
+                    direction: 'right',
+                    visited: false,
+                    isWall: false,
+                    isPath: false,
+                    previousNode: null,
+                }
+                col.push(currentNode)
+            }
+            table.push(col);
+        }
+
+        if(visualizeReset) this.setState({nodes : table, walls : table});
+        this.setState({nodesChecked : 0})
+        return table;
+    }
+
+    resetBoardWithWalls() {
+        let table = this.createClearBoard();
+        let walls = this.state.walls;
+        for(let i = 0; i < table.length; i++) {
+            for(let j = 0; j < table[0].length; j++) {
+                if(walls[i][j].isWall) table[i][j].isWall = true;
+            }
+        }
+        this.setState({nodes : table})
+        return table;
+    }
+
     
 
     render() {
@@ -212,10 +254,12 @@ export default class Visualizer extends Component {
         
         return (
         <>
+        <h1>Nodes checked {this.state.nodesChecked} / {this.state.numberOfNodes}</h1>
         <Button onClick={() => this.visualizeDijkstra()}>Dijkstra</Button>
         <Button onClick={() => this.visualizeAStar()}>A*</Button>
         <Button onClick={() => this.visualizeBiDirection()}>Bi-Directional</Button>
         <Button onClick={() => this.createMaze()}>Generate Maze</Button>
+        <Button onClick={() => this.createClearBoard(true)}>Clear Board</Button>
         <div className='Holder'>
             {nodes.map((row, index) => {
                 return (
@@ -230,9 +274,11 @@ export default class Visualizer extends Component {
                                     col={node.col}
                                     row={node.row}
                                     start={node.isStart} 
+                                    current={node.current}
                                     end={node.isEnd}
                                     visited={node.visited}
                                     distance={node.distance}
+                                    direction={node.direction}
                                     isWall={node.isWall}
                                     isPath={node.isPath}
                                 />
