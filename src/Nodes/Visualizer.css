@@ -47,6 +47,27 @@
     border-inline-width: 1px;
 }
 
+.visualPanel {
+    background-color: rgb(170, 201, 236);
+    text-align: center;
+
+}
+
+
+.visualPanelNode {
+    display: inline-block;
+    padding-left: 10px;
+    padding-right: 20px;
+    vertical-align: middle;
+    position: relative;
+}
+
+.visualPanelCol {
+    display: inline-block;
+    align-items: center;
+    text-align: center;
+}
+
 .button {
 
     padding-top: 7px;

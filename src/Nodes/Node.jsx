@@ -10,9 +10,14 @@ export default class Node extends Component {
     }
 
     render() {
-        const {start, end, visited, isWall, isPath, current, direction} = this.props
+        const {start, end, visited, isWall, isPath, current, direction, display} = this.props
         let className = 'node';
-        if(start && !current) {
+        if(display) {
+            className = 'display'
+            if(visited) className = `display visited`;
+            if(isPath) className = `display path`;
+            if(isWall) className = 'display wall';
+        } else if(start && !current) {
             className = 'node start';
             if(visited) className = 'node start visited';
             if(isPath) className = 'node start path'; 
@@ -30,8 +35,7 @@ export default class Node extends Component {
             if(isWall) className = 'node wall';
         }
         return (
-        <div className={className}>
-        </div>
+        <div className={className}></div>
         )
     }
 }

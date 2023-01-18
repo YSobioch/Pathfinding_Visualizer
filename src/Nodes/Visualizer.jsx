@@ -275,6 +275,18 @@ export default class Visualizer extends Component {
                 </Col>
             </Row>
         </div>
+        <div className='visualPanel'>
+            <div>
+                <div className='visualPanelCol'><h4>Node: </h4> </div>
+                <div className='visualPanelNode'><Node display='true'/></div>
+                <div className='visualPanelCol'><h4>Wall Node: </h4> </div>
+                <div className='visualPanelNode'><Node isWall='true' display='true'/></div>
+                <div className='visualPanelCol'><h4>Visited Node: </h4> </div>
+                <div className='visualPanelNode'><Node visited='true' display='true'/></div>
+                <div className='visualPanelCol'><h4>Path Node: </h4> </div>
+                <div className='visualPanelNode'><Node isPath='true' display='true'/></div>
+            </div>
+        </div>
         <br></br>
         <div className='Holder'>
             {nodes.map((row, index) => {

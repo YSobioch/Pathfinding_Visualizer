@@ -7,6 +7,15 @@
     outline-color: rgb(104, 103, 103);
 }
 
+.display {
+    outline: solid;
+    outline-width: 1px;
+    background-color: white;
+    height: 20px;
+    width: 20px;
+    outline-color: rgb(104, 103, 103); 
+}
+
 .node.start {
     background-image: url(/public/startLocationIcon.png);
 }
@@ -44,14 +53,14 @@
     transform: scale(1.1);
 }
 
-.node.visited {
+.visited {
     background-color: rgb(116, 181, 255);
     animation-name: visiting;
     animation-timing-function: ease;
     animation-duration: 3s;
 }
 
-.node.wall {
+.wall {
     background-color: rgb(41, 40, 40);
     outline-color: rgb(80, 80, 80);
     animation-name: creatingWall;
@@ -63,7 +72,7 @@
     transform: scale(1.2);
 }
 
-.node.path {
+.path {
     background-color: yellow;
     animation-name: path;
     animation-duration: 2s;
