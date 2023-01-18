@@ -11,3 +11,66 @@
     display: inline-block;
     padding: 2px;
 }
+
+.headings {
+    text-align: center;
+    font-family: 'Montserrat', sans-serif;
+}
+
+.controlPanel {
+    background-color: rgb(85, 134, 190);
+    padding: 0px;
+    color:white;
+}
+
+.controlCol {
+    padding: 7px;
+    border-left: solid;
+    border-inline-width: 1px;
+    background-color: rgb(85, 134, 190);
+}
+
+.controlColPressed {
+    padding: 7px;
+    border-right: solid;
+    border-inline-width: 1px;
+    background-color: rgb(68, 106, 150);
+}
+
+.controlCol:hover {
+    background-color: rgb(68, 106, 150);
+}
+
+.lastCol {
+    padding: 7px;
+    border-inline: solid;
+    border-inline-width: 1px;
+}
+
+.button {
+
+    padding-top: 7px;
+    cursor: pointer;
+    text-align: center;
+    user-select: none;
+  -webkit-user-select: none; /*Safari*/
+  -moz-user-select: none;
+}
+
+.button:hover {
+    background-color: rgb(68, 106, 150);
+
+}
+
+.buttonPressed {
+    background-color: rgb(68, 106, 150);
+    padding-top: 7px;
+    cursor: pointer;
+    text-align: center;
+    outline: solid;
+    outline-width: 10px;
+    outline-color: rgb(68, 106, 150);
+    user-select: none;
+  -webkit-user-select: none; /*Safari*/
+  -moz-user-select: none;
+}

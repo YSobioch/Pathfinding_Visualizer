@@ -1,5 +1,7 @@
 import React from 'react';
 import Visualizer from './Nodes/Visualizer';
+import './App.css';
+
 
 function App() {
   

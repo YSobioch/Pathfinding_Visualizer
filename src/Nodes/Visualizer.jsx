@@ -7,6 +7,9 @@ import { randomizedPrim } from '../Algorithms/RandomizedPrim';
 
 import './Visualizer.css'
 import Button from 'react-bootstrap/Button';
+import { Dropdown } from 'react-bootstrap';
+import Row from 'react-bootstrap/Row';
+import Col from 'react-bootstrap/Col';
 
 
 const startCol = 9;
@@ -21,6 +24,7 @@ export default class Visualizer extends Component {
         this.state = {
             nodes : [[]],
             walls : [[]],
+            addWalls : false,
             mouseIsPressed: false,
             nodesChecked : 0,
             numberOfNodes : COLUMNS * ROWS,
@@ -31,7 +35,7 @@ export default class Visualizer extends Component {
     //the user to click and drag walls into place.
     //-------------------------------------------------------------------------------------------------------
     mouseDownHelper(node) {
-        this.setState({...this.state, mouseIsPressed : true,})
+        this.setState({ mouseIsPressed : true,})
         this.changeWall(node);
     }
 
@@ -40,10 +44,11 @@ export default class Visualizer extends Component {
     }
 
     mouseUpHelper() {
-        this.setState({...this.state, mouseIsPressed : false,});
+        this.setState({ mouseIsPressed : false,});
     }
 
     changeWall(node) {
+        if(this.state.addWalls) {
         const newNodes = [...this.state.nodes];
         const newNode = {
             ...node,
@@ -51,6 +56,7 @@ export default class Visualizer extends Component {
         };
         newNodes[node.col][node.row] = newNode;
         this.setState({nodes : newNodes, walls : newNodes})
+        }
     }
     //--------------------------------------------------------------------------------------------------------
     
@@ -67,6 +73,7 @@ export default class Visualizer extends Component {
             node.visited = false;
         }
 
+        let count = 0;
         for(let i = 0; i < visitedNodes.length; i++) {
             setTimeout(() => {
                 const node = visitedNodes[i];
@@ -76,9 +83,9 @@ export default class Visualizer extends Component {
                 ...node,
                 visited: true,
             };
+            count++;
             newNodes[node.col][node.row] = newNode;
-            this.setState({nodes: newNodes});
-            this.setState({nodesChecked : this.state.nodesChecked++})
+            this.setState({nodes: newNodes, nodesChecked : count});
             if(i === visitedNodes.length - 1) {
                 binary ? this.animateBinaryPath(node) : this.animatePath(node);
             }
@@ -254,12 +261,21 @@ export default class Visualizer extends Component {
         
         return (
         <>
-        <h1>Nodes checked {this.state.nodesChecked} / {this.state.numberOfNodes}</h1>
-        <Button onClick={() => this.visualizeDijkstra()}>Dijkstra</Button>
-        <Button onClick={() => this.visualizeAStar()}>A*</Button>
-        <Button onClick={() => this.visualizeBiDirection()}>Bi-Directional</Button>
-        <Button onClick={() => this.createMaze()}>Generate Maze</Button>
-        <Button onClick={() => this.createClearBoard(true)}>Clear Board</Button>
+        <h1 className='headings'>Pathfinding Visualizer</h1>
+        <div className='controlPanel'>
+            <Row className="justify-content-md-center">
+                <Col xs lg="1" className='controlCol'><div className='button' onClick={() => this.visualizeDijkstra()}>Dijkstra</div></Col>
+                <Col xs lg="1" className='controlCol'><div className='button' onClick={() => this.visualizeAStar()}>A*</div></Col>
+                <Col xs lg="1" className='controlCol lastCol'><div className='button' onClick={() => this.visualizeBiDirection()}>Bi-Directional</div></Col>
+                <Col xs lg='2'></Col>
+                <Col xs lg="1" className='controlCol'><div className='button' onClick={() => this.createMaze()}>Generate Maze</div></Col>
+                <Col xs lg="1" className='controlCol'><div className='button' onClick={() => this.createClearBoard(true)}>Clear Board</div></Col>
+                <Col xs lg="1" className={this.state.addWalls ? 'controlColPressed lastCol' : 'controlCol lastCol'}>
+                    <div className='button' onClick={() => this.setState({addWalls : !this.state.addWalls, mouseIsPressed : false})} >Add Walls</div>
+                </Col>
+            </Row>
+        </div>
+        <br></br>
         <div className='Holder'>
             {nodes.map((row, index) => {
                 return (
@@ -288,6 +304,7 @@ export default class Visualizer extends Component {
                 </div>
             )})}
         </div>
+        <h1 className='headings'>Nodes checked <span><h1>{this.state.nodesChecked} / {this.state.numberOfNodes}</h1></span></h1> 
         </>
     )
   }
