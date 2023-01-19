@@ -24,6 +24,11 @@
     background-image: url(/public/startIcon.png); 
 }
 
+.node.current:hover {
+    transform: scale(1.1);
+    cursor: grab;
+}
+
 .node.node.current.up {
     transform: rotate(270deg);
 }
@@ -43,6 +48,8 @@
 
 .node.start:hover {
     transform: scale(1.1);
+    cursor: grab;
+    
 }
 
 .node.end {
@@ -51,6 +58,7 @@
 
 .node.end:hover {
     transform: scale(1.1);
+    cursor: grab;
 }
 
 .visited {

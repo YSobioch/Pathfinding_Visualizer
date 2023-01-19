@@ -12,10 +12,10 @@ import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 
 
-const startCol = 9;
-const startRow = 9;
-const endCol = 40;
-const endRow = 9;
+const START_COL = 9;
+const START_ROW = 9;
+const END_COL = 40;
+const END_ROW = 9;
 const COLUMNS = 50;
 const ROWS = 20;
 export default class Visualizer extends Component {
@@ -27,6 +27,12 @@ export default class Visualizer extends Component {
             addWalls : false,
             mouseIsPressed: false,
             nodesChecked : 0,
+            startCol : 9,
+            startRow : 9,
+            endRow : 9,
+            endCol : 40,
+            lookingForStart : false,
+            lookingForEnd : false,
             numberOfNodes : COLUMNS * ROWS,
         }
     }
@@ -36,19 +42,33 @@ export default class Visualizer extends Component {
     //-------------------------------------------------------------------------------------------------------
     mouseDownHelper(node) {
         this.setState({ mouseIsPressed : true,})
+        if(node.isStart || this.state.lookingForStart) {
+            this.setState({lookingForStart : true});
+            this.changeStartOrEnd(node, true);
+        }
+        if(node.isEnd || this.state.lookingForEnd) {
+            this.setState({lookingForEnd : true});
+            this.changeStartOrEnd(node, false);
+        }
         this.changeWall(node);
     }
 
     mouseEnterHelper(node) {
+        if(this.state.lookingForStart) {
+            this.changeStartOrEnd(node, true);
+        }
+        if(this.state.lookingForEnd) {
+            this.changeStartOrEnd(node, false);
+        }
         if(this.state.mouseIsPressed) this.changeWall(node);
     }
 
     mouseUpHelper() {
-        this.setState({ mouseIsPressed : false,});
+        this.setState({ mouseIsPressed : false, lookingForStart : false, lookingForEnd : false});
     }
 
     changeWall(node) {
-        if(this.state.addWalls) {
+        if(this.state.addWalls && !node.isStart && !node.isEnd) {
         const newNodes = [...this.state.nodes];
         const newNode = {
             ...node,
@@ -57,6 +77,22 @@ export default class Visualizer extends Component {
         newNodes[node.col][node.row] = newNode;
         this.setState({nodes : newNodes, walls : newNodes})
         }
+    }
+
+    changeStartOrEnd(node, start) {
+        if(start) {
+            this.setStart(node.col, node.row);
+        } else {
+            this.setEnd(node.col, node.row);
+        }
+    }
+
+    setStart(col, row) {
+        this.setState({startCol : col, startRow : row, addWalls : false}, () => this.resetBoardWithWalls());
+    }
+
+    setEnd(col, row) {
+        this.setState({endCol : col, endRow : row}, () => this.resetBoardWithWalls());
     }
     //--------------------------------------------------------------------------------------------------------
     
@@ -169,24 +205,24 @@ export default class Visualizer extends Component {
     //uses the djikstra algorithm to generate visitedNodes, and then animates them
     visualizeDijkstra() {
         const nodes = this.resetBoardWithWalls();
-        const startNode = nodes[startCol][startRow];
-        const endNode = nodes[endCol][endRow];
+        const startNode = nodes[this.state.startCol][this.state.startRow];
+        const endNode = nodes[this.state.endCol][this.state.endRow];
         const visitedNodesInOrder = dijkstra(nodes, startNode, endNode);
         this.animateAlgorithm(visitedNodesInOrder);
     }
 
     visualizeAStar() {
         const nodes = this.resetBoardWithWalls();
-        const startNode = nodes[startCol][startRow];
-        const endNode = nodes[endCol][endRow];
+        const startNode = nodes[this.state.startCol][this.state.startRow];
+        const endNode = nodes[this.state.endCol][this.state.endRow];
         const visitedNodesInOrder = aStar(nodes, startNode, endNode);
         this.animateAlgorithm(visitedNodesInOrder);
     }
 
     visualizeBiDirection() {
         const nodes = this.resetBoardWithWalls();
-        const startNode = nodes[startCol][startRow];
-        const endNode = nodes[endCol][endRow];
+        const startNode = nodes[this.state.startCol][this.state.startRow];
+        const endNode = nodes[this.state.endCol][this.state.endRow];
         const visitedNodesInOrder = biDirectional(startNode, endNode, nodes);
         this.animateAlgorithm(visitedNodesInOrder, true);
     }
@@ -194,7 +230,7 @@ export default class Visualizer extends Component {
     //uses the randomized prim algorithm to generate a random maze
     createMaze() {
         this.createClearBoard(true);
-        let wallGrid = randomizedPrim(startCol, startRow, endCol, endRow);
+        let wallGrid = randomizedPrim(START_COL, START_ROW, END_COL, END_ROW);
         for(let i = 0; i < wallGrid.length; i++) {
             for(let j = 0; j < wallGrid[0].length; j++) {
                 setTimeout(() => {
@@ -215,6 +251,16 @@ export default class Visualizer extends Component {
 
     createClearBoard(visualizeReset = false){
         let table = [];
+        let startCol = this.state.startCol;
+        let startRow = this.state.startRow;
+        let endCol = this.state.endCol;
+        let endRow = this.state.endRow;
+        if(visualizeReset) {
+            startCol = START_COL;
+            startRow = START_ROW;
+            endCol = END_COL;
+            endRow = END_ROW;
+        }
         for(let i = 0; i < 50; i++) {
             let col = []
             for(let j = 0; j < 20; j++) {
@@ -237,7 +283,8 @@ export default class Visualizer extends Component {
             table.push(col);
         }
 
-        if(visualizeReset) this.setState({nodes : table, walls : table});
+        if(visualizeReset) this.setState({nodes : table, walls : table, startCol : startCol,
+                                        endCol: endCol, startRow : startRow, endRow : endRow});
         this.setState({nodesChecked : 0})
         return table;
     }
@@ -247,7 +294,9 @@ export default class Visualizer extends Component {
         let walls = this.state.walls;
         for(let i = 0; i < table.length; i++) {
             for(let j = 0; j < table[0].length; j++) {
-                if(walls[i][j].isWall) table[i][j].isWall = true;
+               if(walls[i][j].isWall && !table[i][j].isStart && !table.isEnd){
+                    table[i][j].isWall = true;
+                }
             }
         }
         this.setState({nodes : table})
