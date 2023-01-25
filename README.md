@@ -21,5 +21,8 @@ user.
 Aside from desplaying the algorithms, the app allows for the user to create walls,
 move the starting and ending points, and reset the board.
 
+# Demo
+
+https://master.d28u670zarsz8j.amplifyapp.com/
 
 
